@@ -3,11 +3,6 @@ import type { Story } from '../../src/types/story';
 
 /**
  * Unit tests for the sortStories utility function.
- *
- * Tests both sort modes ('score' and 'time') to ensure:
- * - Correct ordering (descending)
- * - Input immutability (original array not mutated)
- * - Edge cases (empty arrays, single items)
  */
 describe('sortStories', () => {
   const mockStories: Story[] = [
