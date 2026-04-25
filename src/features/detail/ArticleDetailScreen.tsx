@@ -72,10 +72,7 @@ export const ArticleDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const handleOpenUrl = useCallback(async () => {
     try {
-      const canOpen = await Linking.canOpenURL(story.url);
-      if (canOpen) {
-        await Linking.openURL(story.url);
-      }
+      await Linking.openURL(story.url);
     } catch {
       Alert.alert('Error', 'Failed to open this link.');
     }
