@@ -1,6 +1,6 @@
 # HackerFeed 🔥
 
-A production-quality React Native CLI app for browsing Hacker News top stories. Built with TypeScript, Zustand, MMKV persistence, and React Navigation.
+A production-quality React Native CLI app for browsing Hacker News top stories. Built with TypeScript, Zustand, MMKV persistence, Lucide icons, and React Navigation.
 
 ![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20Android-blue)
 ![TypeScript](https://img.shields.io/badge/language-TypeScript-3178C6)
@@ -35,11 +35,11 @@ A production-quality React Native CLI app for browsing Hacker News top stories. 
 
 ```bash
 # 1. Clone and install dependencies
-git clone <repo-url>
+git clone https://github.com/minhaz19/hacker-feed.git
 cd HackerFeed
 npm install
 
-# 2. iOS: Install native pods (required for MMKV's native module)
+# 2. iOS: Install native pods (required for MMKV, SVG, etc.)
 cd ios && pod install && cd ..
 
 # 3. Run the app
@@ -65,13 +65,17 @@ npm test
 ```
 ┌─────────────────────────────────────────────┐
 │                   App.tsx                    │
-│             (GestureHandler + Nav)           │
+│          (GestureHandlerRootView)            │
 ├─────────────────────────────────────────────┤
-│           RootTabNavigator                  │
-│      ┌──────────┐  ┌───────────┐           │
-│      │ Feed Tab  │  │Bookmarks  │           │
-│      │  (Stack)  │  │   Tab     │           │
-│      └──────────┘  └───────────┘           │
+│              AppNavigator                   │
+│           (Root Stack Navigator)            │
+│   ┌───────────────────┐  ┌──────────────┐  │
+│   │    MainTabs        │  │ArticleDetail │  │
+│   │  (TabNavigator)    │  │  (no tabs)   │  │
+│   │  ┌──────┐┌──────┐ │  └──────────────┘  │
+│   │  │ Feed ││Marks │ │                     │
+│   │  └──────┘└──────┘ │                     │
+│   └───────────────────┘                     │
 ├─────────────────────────────────────────────┤
 │              Zustand Stores                 │
 │     ┌──────────┐  ┌──────────────┐         │
@@ -83,6 +87,8 @@ npm test
 │         Hacker News Firebase API            │
 └─────────────────────────────────────────────┘
 ```
+
+The **ArticleDetail** screen lives at the root stack level (above the tab navigator). This means the bottom tab bar is naturally hidden when viewing an article — no visibility hacks needed.
 
 ### Data Flow
 
@@ -106,14 +112,14 @@ src/
 │   ├── detail/
 │   │   └── ArticleDetailScreen.tsx # Story detail + share + bookmark
 │   └── bookmarks/
-│       └── BookmarksScreen.tsx     # Saved stories list
+│       └── BookmarksScreen.tsx     # Saved stories with swipe-to-remove
 ├── store/
 │   ├── feedStore.ts                # Feed state (Zustand)
 │   ├── bookmarkStore.ts           # Bookmarks with MMKV persist
 │   └── index.ts
 ├── navigation/
-│   ├── FeedStackNavigator.tsx      # Stack: List → Detail
-│   ├── RootTabNavigator.tsx        # Bottom tabs: Feed + Bookmarks
+│   ├── AppNavigator.tsx            # Root stack (Tabs + ArticleDetail)
+│   ├── TabNavigator.tsx            # Bottom tabs (Feed + Bookmarks)
 │   └── index.ts
 ├── hooks/
 │   ├── useHackerNewsApi.ts         # API fetch functions
@@ -124,16 +130,16 @@ src/
 │   ├── time.ts                     # Relative & absolute time formatting
 │   └── url.ts                      # Domain extraction, favicon URLs
 ├── storage/
-│   ├── mmkv.ts                     # MMKV singleton instance
+│   ├── mmkv.ts                     # MMKV singleton (createMMKV v4)
 │   ├── zustandMMKVStorage.ts       # Zustand StateStorage adapter
 │   └── index.ts
 ├── types/
 │   ├── story.ts                    # HNItem, Story, SortMode, LoadingState
-│   └── navigation.ts              # Stack & Tab param lists
+│   └── navigation.ts              # RootStack & Tab param lists
 └── components/
     └── shared/
         ├── SkeletonLoader.tsx      # Animated skeleton UI
-        ├── EmptyState.tsx          # Empty list state
+        ├── EmptyState.tsx          # Empty list state (Lucide icon prop)
         ├── ErrorState.tsx          # Error with retry
         ├── OfflineBanner.tsx       # Network status banner
         └── index.ts
@@ -155,10 +161,14 @@ src/
 | Share button (header) | ✅ |
 | Bookmark toggle (MMKV persist) | ✅ |
 | Bookmarks tab with badge | ✅ |
-| Remove bookmark | ✅ |
+| Swipe-to-remove bookmarks | ✅ |
 | Debounced search bar | ✅ |
 | Offline connectivity banner | ✅ |
 | Memoised list items | ✅ |
+| Lucide icons (react-native-svg) | ✅ |
+| `@/` path alias | ✅ |
+| Tab bar hidden on detail screen | ✅ |
+| Error alerts for share/link failures | ✅ |
 | Unit tests (sort logic) | ✅ |
 | Component tests (StoryItem) | ✅ |
 
@@ -194,11 +204,15 @@ npx jest --watch            # Watch mode
 | Decision | Rationale |
 |----------|-----------|
 | **Zustand over Redux** | Minimal boilerplate, built-in `persist` middleware, excellent TypeScript support, and tiny bundle size (~1KB). For 3 screens with simple state, Redux would be overengineered. |
-| **MMKV over AsyncStorage** | JSI-based synchronous reads (~30x faster), no bridge overhead, C++ implementation. Critical for instant bookmark restoration on cold start. |
+| **MMKV over AsyncStorage** | JSI-based synchronous reads (~30x faster), no bridge overhead, C++ implementation. Critical for instant bookmark restoration on cold start. Uses `createMMKV()` factory (v4 API). |
 | **Feature-based folders** | Co-locates related screens, components, and logic. Scales naturally — adding a new feature means adding a new folder, not touching 6 different directories. |
 | **Pure utility functions** | `sortStories`, `extractDomain`, `getRelativeTime` are pure functions extracted from UI. Easy to test, easy to reason about, zero coupling. |
-| **Record<number, Story> for bookmarks** | O(1) lookups for `isBookmarked()` checks. FlatList re-renders on every scroll; an array `.find()` would be O(n) on each render. |
+| **Record\<number, Story\> for bookmarks** | O(1) lookups for `isBookmarked()` checks. FlatList re-renders on every scroll; an array `.find()` would be O(n) on each render. |
 | **Zustand selectors** | Each component subscribes to the minimal slice it needs. `useFeedStore(s => s.sortMode)` only re-renders when `sortMode` changes, not when `stories` updates. |
+| **Root stack for detail screen** | ArticleDetail is placed above the tab navigator in a root stack. This naturally hides the bottom tab bar without any visibility hacks. |
+| **Lucide icons over emojis** | `lucide-react-native` provides crisp, scalable SVG icons via `react-native-svg`. Consistent cross-platform rendering instead of platform-dependent emoji. |
+| **Swipe-to-remove (Reanimated)** | `ReanimatedSwipeable` from gesture-handler provides a native-feeling swipe experience. Full-swipe auto-deletes, partial swipe reveals a delete button. |
+| **`@/` path alias** | `babel-plugin-module-resolver` maps `@/` → `./src/` for cleaner imports. Configured in both `tsconfig.json` (TypeScript) and `babel.config.js` (Metro). |
 
 ---
 
@@ -206,15 +220,11 @@ npx jest --watch            # Watch mode
 
 1. **No WebView for article reading**: We open URLs via `Linking.openURL` (system browser). A WebView would keep users in-app but adds complexity and memory overhead.
 
-2. **Swipe-to-delete uses Alert**: True swipe gestures require `react-native-gesture-handler` Swipeable or `react-native-reanimated` layout animations. We use a delete button + confirmation dialog for reliability across platforms.
+2. **No pagination**: We fetch 20 stories upfront. For a production app with 500+ stories, you'd want infinite scroll with cursor-based pagination.
 
-3. **No pagination**: We fetch 20 stories upfront. For a production app with 500+ stories, you'd want infinite scroll with cursor-based pagination.
+3. **No offline caching of stories**: Bookmarks persist but the feed doesn't cache. A production app would cache the last-fetched feed in MMKV for instant display on cold start.
 
-4. **No offline caching of stories**: Bookmarks persist but the feed doesn't cache. A production app would cache the last-fetched feed in MMKV for instant display on cold start.
-
-5. **Emoji icons vs vector icons**: We use emoji (📰, ★, ▲) instead of a vector icon library to avoid the native linking step for `react-native-vector-icons`. In production, you'd use SF Symbols / Material Icons.
-
-6. **getItemLayout assumes fixed height**: The `ITEM_HEIGHT` constant approximates actual item height. If title text wraps to 3+ lines, scroll position calculations may be slightly off.
+4. **getItemLayout assumes fixed height**: The `ITEM_HEIGHT` constant approximates actual item height. If title text wraps to 3+ lines, scroll position calculations may be slightly off.
 
 ---
 

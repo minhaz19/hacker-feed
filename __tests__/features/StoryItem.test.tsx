@@ -41,7 +41,7 @@ describe('StoryItem', () => {
       <StoryItem story={mockStory} onPress={mockOnPress} />,
     );
 
-    expect(getByText('▲ 142')).toBeTruthy();
+    expect(getByText('142')).toBeTruthy();
   });
 
   it('should call onPress with the story when tapped', () => {
