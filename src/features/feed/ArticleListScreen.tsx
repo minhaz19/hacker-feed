@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Inbox } from 'lucide-react-native';
 import type { RootStackParamList } from '../../types/navigation';
 import type { Story } from '../../types/story';
 import { useFeedStore } from '../../store/feedStore';
@@ -122,7 +123,7 @@ export const ArticleListScreen: React.FC = () => {
         // ListHeaderComponent={ListHeaderComponent}
         ListEmptyComponent={
           <EmptyState
-            icon="📭"
+            Icon={Inbox}
             title="No stories found"
             message="Try adjusting your search or pull to refresh."
           />

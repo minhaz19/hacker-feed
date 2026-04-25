@@ -15,6 +15,7 @@ import Animated, {
   useAnimatedStyle,
   type SharedValue,
 } from 'react-native-reanimated';
+import { Trash2, TrendingUp, ChevronLeft, BookmarkX } from 'lucide-react-native';
 import { useBookmarkStore } from '../../store/bookmarkStore';
 import { EmptyState } from '../../components/shared';
 import { getRelativeTime } from '../../utils/time';
@@ -40,7 +41,7 @@ function RightAction(
           onDelete();
         }}
         activeOpacity={0.7}>
-        <Text style={styles.deleteIcon}>🗑️</Text>
+        <Trash2 color="#FFFFFF" size={20} style={styles.deleteIcon} />
         <Text style={styles.deleteText}>Delete</Text>
       </TouchableOpacity>
     </Animated.View>
@@ -73,9 +74,7 @@ const SwipeableBookmarkItem: React.FC<SwipeableBookmarkItemProps> = ({
 
   const handleSwipeableOpen = useCallback(
     (direction: string) => {
-      // Auto-delete when fully swiped left
       if (direction === 'right') {
-        // 'right' direction means the right actions opened (swiped left)
         handleDelete();
       }
     },
@@ -108,14 +107,17 @@ const SwipeableBookmarkItem: React.FC<SwipeableBookmarkItemProps> = ({
             <View style={styles.metaRow}>
               <Text style={styles.domain}>{story.domain}</Text>
               <Text style={styles.separator}>•</Text>
-              <Text style={styles.score}>▲ {story.score}</Text>
+              <View style={styles.scoreContainer}>
+                <TrendingUp color="#30D158" size={11} />
+                <Text style={styles.score}>{story.score}</Text>
+              </View>
               <Text style={styles.separator}>•</Text>
               <Text style={styles.time}>{getRelativeTime(story.time)}</Text>
             </View>
           </View>
         </View>
         <View style={styles.swipeHint}>
-          <Text style={styles.swipeHintText}>◂</Text>
+          <ChevronLeft color="#48484A" size={14} />
         </View>
       </View>
     </ReanimatedSwipeable>
@@ -155,7 +157,10 @@ export const BookmarksScreen: React.FC = () => {
       <StatusBar barStyle="light-content" backgroundColor="#000000" />
       {bookmarkedStories.length > 0 && (
         <View style={styles.hintBanner}>
-          <Text style={styles.hintBannerText}>← Swipe left to remove</Text>
+          <View style={styles.hintContent}>
+            <ChevronLeft color="#636366" size={12} />
+            <Text style={styles.hintBannerText}>Swipe left to remove</Text>
+          </View>
         </View>
       )}
       <FlatList
@@ -169,7 +174,7 @@ export const BookmarksScreen: React.FC = () => {
         }
         ListEmptyComponent={
           <EmptyState
-            icon="📑"
+            Icon={BookmarkX}
             title="No bookmarks yet"
             message="Bookmark stories from the feed to save them for later."
           />
@@ -196,10 +201,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
+  hintContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 4,
+  },
   hintBannerText: {
     fontSize: 12,
     color: '#636366',
-    textAlign: 'right',
   },
   swipeableContainer: {
     marginBottom: 10,
@@ -259,6 +269,11 @@ const styles = StyleSheet.create({
     color: '#48484A',
     marginHorizontal: 6,
   },
+  scoreContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
   score: {
     fontSize: 12,
     color: '#30D158',
@@ -272,10 +287,6 @@ const styles = StyleSheet.create({
     width: 20,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  swipeHintText: {
-    fontSize: 10,
-    color: '#48484A',
   },
   rightActionContainer: {
     width: 90,
@@ -292,7 +303,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   deleteIcon: {
-    fontSize: 20,
     marginBottom: 4,
   },
   deleteText: {

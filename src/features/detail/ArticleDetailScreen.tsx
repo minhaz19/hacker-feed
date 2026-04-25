@@ -9,8 +9,19 @@ import {
   Share,
   StatusBar,
   Image,
+  Alert,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {
+  Bookmark,
+  BookmarkCheck,
+  Share2,
+  User,
+  TrendingUp,
+  Clock,
+  Timer,
+  ExternalLink,
+} from 'lucide-react-native';
 import type { RootStackParamList } from '../../types/navigation';
 import { useBookmarkStore } from '../../store/bookmarkStore';
 import { formatFullDate, getRelativeTime } from '../../utils/time';
@@ -31,7 +42,7 @@ export const ArticleDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         message: `${story.title}\n${story.url}`,
       });
     } catch {
-      // User cancelled or share failed
+      Alert.alert('Error', 'Failed to share this article.');
     }
   }, [story]);
 
@@ -45,12 +56,14 @@ export const ArticleDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       headerRight: () => (
         <View style={styles.headerButtons}>
           <TouchableOpacity onPress={handleBookmarkToggle} style={styles.headerButton}>
-            <Text style={styles.headerButtonText}>
-              {isBookmarked ? '★' : '☆'}
-            </Text>
+            {isBookmarked ? (
+              <BookmarkCheck color="#FF6600" size={22} />
+            ) : (
+              <Bookmark color="#FF6600" size={22} />
+            )}
           </TouchableOpacity>
           <TouchableOpacity onPress={handleShare} style={styles.headerButton}>
-            <Text style={styles.headerButtonText}>↗</Text>
+            <Share2 color="#FF6600" size={22} />
           </TouchableOpacity>
         </View>
       ),
@@ -64,7 +77,7 @@ export const ArticleDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         await Linking.openURL(story.url);
       }
     } catch {
-      // Failed to open URL
+      Alert.alert('Error', 'Failed to open this link.');
     }
   }, [story.url]);
 
@@ -91,10 +104,10 @@ export const ArticleDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
           {/* Metadata */}
           <View style={styles.metaSection}>
-            <MetaRow label="Author" value={story.by} icon="👤" />
-            <MetaRow label="Score" value={`${story.score} points`} icon="▲" />
-            <MetaRow label="Posted" value={formatFullDate(story.time)} icon="🕐" />
-            <MetaRow label="Relative" value={getRelativeTime(story.time)} icon="⏱" />
+            <MetaRow label="Author" value={story.by} Icon={User} />
+            <MetaRow label="Score" value={`${story.score} points`} Icon={TrendingUp} />
+            <MetaRow label="Posted" value={formatFullDate(story.time)} Icon={Clock} />
+            <MetaRow label="Relative" value={getRelativeTime(story.time)} Icon={Timer} />
           </View>
         </View>
 
@@ -107,7 +120,7 @@ export const ArticleDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           <Text style={styles.linkUrl} numberOfLines={2}>
             {story.url}
           </Text>
-          <Text style={styles.linkArrow}>→</Text>
+          <ExternalLink color="#0A84FF" size={20} style={styles.linkArrow} />
         </TouchableOpacity>
 
         {/* Bookmark status */}
@@ -118,9 +131,11 @@ export const ArticleDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           ]}
           onPress={handleBookmarkToggle}
           activeOpacity={0.7}>
-          <Text style={styles.bookmarkIcon}>
-            {isBookmarked ? '★' : '☆'}
-          </Text>
+          {isBookmarked ? (
+            <BookmarkCheck color="#FF6600" size={22} />
+          ) : (
+            <Bookmark color="#FF6600" size={22} />
+          )}
           <Text style={styles.bookmarkText}>
             {isBookmarked ? 'Bookmarked' : 'Add to Bookmarks'}
           </Text>
@@ -133,12 +148,14 @@ export const ArticleDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 interface MetaRowProps {
   label: string;
   value: string;
-  icon: string;
+  Icon: React.ComponentType<{ color: string; size: number }>;
 }
 
-const MetaRow: React.FC<MetaRowProps> = ({ label, value, icon }) => (
+const MetaRow: React.FC<MetaRowProps> = ({ label, value, Icon }) => (
   <View style={styles.metaRow}>
-    <Text style={styles.metaIcon}>{icon}</Text>
+    <View style={styles.metaIconContainer}>
+      <Icon color="#8E8E93" size={16} />
+    </View>
     <View style={styles.metaContent}>
       <Text style={styles.metaLabel}>{label}</Text>
       <Text style={styles.metaValue}>{value}</Text>
@@ -196,9 +213,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  metaIcon: {
-    fontSize: 16,
+  metaIconContainer: {
     width: 28,
+    alignItems: 'center',
   },
   metaContent: {
     flex: 1,
@@ -235,8 +252,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   linkArrow: {
-    fontSize: 20,
-    color: '#0A84FF',
     alignSelf: 'flex-end',
     marginTop: 4,
   },
@@ -255,10 +270,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF660015',
     borderColor: '#FF6600',
   },
-  bookmarkIcon: {
-    fontSize: 22,
-    color: '#FF6600',
-  },
   bookmarkText: {
     fontSize: 16,
     fontWeight: '600',
@@ -270,9 +281,5 @@ const styles = StyleSheet.create({
   },
   headerButton: {
     padding: 6,
-  },
-  headerButtonText: {
-    fontSize: 22,
-    color: '#FF6600',
   },
 });

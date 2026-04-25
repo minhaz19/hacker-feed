@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Flame, Clock } from 'lucide-react-native';
 import type { SortMode } from '../../types/story';
 import { useFeedStore } from '../../store/feedStore';
 
 /**
  * Toggle component for switching between score and time sort modes.
- * Sort state is persisted in the Zustand store and survives navigation.
  */
 export const SortToggle: React.FC = () => {
   const sortMode = useFeedStore(state => state.sortMode);
@@ -22,12 +22,14 @@ export const SortToggle: React.FC = () => {
   return (
     <View style={styles.container}>
       <SortButton
-        label="🔥 Top"
+        icon={<Flame size={14} color={sortMode === 'score' ? '#FF6600' : '#8E8E93'} />}
+        label="Top"
         isActive={sortMode === 'score'}
         onPress={handleScorePress}
       />
       <SortButton
-        label="🕐 New"
+        icon={<Clock size={14} color={sortMode === 'time' ? '#FF6600' : '#8E8E93'} />}
+        label="New"
         isActive={sortMode === 'time'}
         onPress={handleTimePress}
       />
@@ -36,19 +38,23 @@ export const SortToggle: React.FC = () => {
 };
 
 interface SortButtonProps {
+  icon: React.ReactNode;
   label: string;
   isActive: boolean;
   onPress: () => void;
 }
 
-const SortButton: React.FC<SortButtonProps> = ({ label, isActive, onPress }) => (
+const SortButton: React.FC<SortButtonProps> = ({ icon, label, isActive, onPress }) => (
   <TouchableOpacity
     style={[styles.button, isActive && styles.activeButton]}
     onPress={onPress}
     activeOpacity={0.7}>
-    <Text style={[styles.buttonText, isActive && styles.activeButtonText]}>
-      {label}
-    </Text>
+    <View style={styles.buttonContent}>
+      {icon}
+      <Text style={[styles.buttonText, isActive && styles.activeButtonText]}>
+        {label}
+      </Text>
+    </View>
   </TouchableOpacity>
 );
 
@@ -70,6 +76,11 @@ const styles = StyleSheet.create({
   activeButton: {
     backgroundColor: '#FF660020',
     borderColor: '#FF6600',
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   buttonText: {
     fontSize: 13,

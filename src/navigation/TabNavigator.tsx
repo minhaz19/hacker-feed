@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { Newspaper, Bookmark } from 'lucide-react-native';
 import type { RootTabParamList } from '../types/navigation';
 import { ArticleListScreen } from '../features/feed/ArticleListScreen';
 import { BookmarksScreen } from '../features/bookmarks/BookmarksScreen';
@@ -38,7 +39,7 @@ const TabNavigator: React.FC = () => {
           headerShadowVisible: false,
           tabBarLabel: 'Feed',
           tabBarIcon: ({ color, size }) => (
-            <Text style={[styles.tabIcon, { color, fontSize: size }]}>📰</Text>
+            <Newspaper color={color} size={size} />
           ),
         }}
       />
@@ -54,7 +55,7 @@ const TabNavigator: React.FC = () => {
           headerShadowVisible: false,
           tabBarLabel: 'Bookmarks',
           tabBarIcon: ({ color, size }) => (
-            <Text style={[styles.tabIcon, { color, fontSize: size }]}>★</Text>
+            <Bookmark color={color} size={size} />
           ),
           tabBarBadge: bookmarkCount > 0 ? bookmarkCount : undefined,
           tabBarBadgeStyle: styles.badge,
@@ -77,9 +78,6 @@ const styles = StyleSheet.create({
   tabBarLabel: {
     fontSize: 11,
     fontWeight: '600',
-  },
-  tabIcon: {
-    marginTop: 4,
   },
   header: {
     backgroundColor: '#000000',

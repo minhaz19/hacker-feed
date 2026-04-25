@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import type { LucideIcon } from 'lucide-react-native';
 
 interface EmptyStateProps {
-  icon: string;
+  Icon: LucideIcon;
   title: string;
   message: string;
   actionLabel?: string;
@@ -13,7 +14,7 @@ interface EmptyStateProps {
  * Reusable empty state component for lists with no data.
  */
 export const EmptyState: React.FC<EmptyStateProps> = ({
-  icon,
+  Icon,
   title,
   message,
   actionLabel,
@@ -21,7 +22,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.icon}>{icon}</Text>
+      <Icon color="#636366" size={48} style={styles.icon} />
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
       {actionLabel && onAction && (
@@ -42,7 +43,6 @@ const styles = StyleSheet.create({
     paddingVertical: 64,
   },
   icon: {
-    fontSize: 48,
     marginBottom: 16,
   },
   title: {

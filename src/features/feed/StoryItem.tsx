@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
+import { TrendingUp, ChevronRight } from 'lucide-react-native';
 import type { Story } from '../../types/story';
 import { getRelativeTime } from '../../utils/time';
 import { getFaviconUrl } from '../../utils/url';
@@ -44,13 +45,16 @@ const StoryItemComponent: React.FC<StoryItemProps> = ({ story, onPress }) => {
         <View style={styles.metaRow}>
           <Text style={styles.domain}>{story.domain}</Text>
           <Text style={styles.separator}>•</Text>
-          <Text style={styles.score}>▲ {story.score}</Text>
+          <View style={styles.scoreContainer}>
+            <TrendingUp color="#30D158" size={11} />
+            <Text style={styles.score}>{story.score}</Text>
+          </View>
           <Text style={styles.separator}>•</Text>
           <Text style={styles.time}>{getRelativeTime(story.time)}</Text>
         </View>
       </View>
       <View style={styles.chevron}>
-        <Text style={styles.chevronText}>›</Text>
+        <ChevronRight color="#48484A" size={18} />
       </View>
     </TouchableOpacity>
   );
@@ -67,7 +71,6 @@ const styles = StyleSheet.create({
     marginVertical: 6,
     borderRadius: 12,
     padding: 14,
-    // Subtle shadow for depth
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
@@ -112,6 +115,11 @@ const styles = StyleSheet.create({
     color: '#48484A',
     marginHorizontal: 6,
   },
+  scoreContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
   score: {
     fontSize: 12,
     color: '#30D158',
@@ -123,10 +131,5 @@ const styles = StyleSheet.create({
   },
   chevron: {
     marginLeft: 8,
-  },
-  chevronText: {
-    fontSize: 22,
-    color: '#48484A',
-    fontWeight: '300',
   },
 });

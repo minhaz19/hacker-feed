@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { AlertTriangle } from 'lucide-react-native';
 
 interface ErrorStateProps {
   message: string;
@@ -12,7 +13,7 @@ interface ErrorStateProps {
 export const ErrorState: React.FC<ErrorStateProps> = ({ message, onRetry }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.icon}>⚠️</Text>
+      <AlertTriangle color="#FF453A" size={48} style={styles.icon} />
       <Text style={styles.title}>Something went wrong</Text>
       <Text style={styles.message}>{message}</Text>
       {onRetry && (
@@ -33,7 +34,6 @@ const styles = StyleSheet.create({
     paddingVertical: 64,
   },
   icon: {
-    fontSize: 48,
     marginBottom: 16,
   },
   title: {

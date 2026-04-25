@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { Search, X } from 'lucide-react-native';
 import { useDebounce } from '../../hooks/useAppHooks';
 import { useFeedStore } from '../../store/feedStore';
 
@@ -20,7 +21,7 @@ export const SearchBar: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
-        <Text style={styles.searchIcon}>🔍</Text>
+        <Search color="#636366" size={16} style={styles.searchIcon} />
         <TextInput
           style={styles.input}
           placeholder="Search stories..."
@@ -34,7 +35,7 @@ export const SearchBar: React.FC = () => {
         />
         {inputValue.length > 0 && (
           <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
-            <Text style={styles.clearText}>✕</Text>
+            <X color="#8E8E93" size={16} />
           </TouchableOpacity>
         )}
       </View>
@@ -56,7 +57,6 @@ const styles = StyleSheet.create({
     height: 40,
   },
   searchIcon: {
-    fontSize: 14,
     marginRight: 8,
   },
   input: {
@@ -68,9 +68,5 @@ const styles = StyleSheet.create({
   clearButton: {
     padding: 4,
     marginLeft: 4,
-  },
-  clearText: {
-    fontSize: 14,
-    color: '#8E8E93',
   },
 });
